@@ -5,8 +5,6 @@ import Map from "../components/ui/Map";
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';  // <-- c’est ici que tu dois l’importer
-
-
 export default function HomePage() {
   const [location, setLocation] = useState("");
 
