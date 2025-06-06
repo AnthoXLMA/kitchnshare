@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-
+import Map from "../components/ui/Map";
+import React from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';  // <-- c’est ici que tu dois l’importer
 export default function HomePage() {
   const [location, setLocation] = useState("");
 
@@ -35,6 +37,10 @@ export default function HomePage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+      <div>
+        <h2>Nos emplacements</h2>
+        <Map />
       </div>
     </div>
   );
