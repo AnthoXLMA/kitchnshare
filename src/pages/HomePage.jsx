@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import 'leaflet/dist/leaflet.css';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import BookingForm from "../components/ui/BookingForm";
 
 export default function HomePage() {
   // États pour les filtres de recherche
