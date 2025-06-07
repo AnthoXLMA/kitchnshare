@@ -31,11 +31,6 @@ export default function HomePage() {
       }
     };
 
-    useEffect(() => {
-  console.log(listings);
-}, [listings]);
-
-
     fetchListings();
   }, []);
 
