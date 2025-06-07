@@ -6,6 +6,8 @@ import HomePage from "./pages/HomePage";
 // import NotFoundPage from "./pages/NotFoundPage";
 import CreateListingForm from "./components/ui/CreateListingForm";
 import CheckoutForm from "./components/ui/CheckoutForm";
+import AuthForm from "./components/ui/AuthForm";
+import useAuth from "./hooks/useAuth";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import "./App.css";
@@ -13,17 +15,27 @@ import "./App.css";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export default function App() {
+  const user = useAuth(); // <- ici, DANS le composant fonctionnel
+
   return (
     <BrowserRouter>
       <Elements stripe={stripePromise}>
         <Navbar /> {/* Barre de navigation */}
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          {/*<Route path="/about" element={<AboutPage />} />*/}
-          <Route path="/create" element={<CreateListingForm />} />
-          <Route path="/checkout" element={<CheckoutForm />} />
-          {/*<Route path="*" element={<NotFoundPage />} />*/}
-        </Routes>
+        <div>
+          {!user ? (
+            <AuthForm />
+          ) : (
+            <p>Bienvenue {user.email} ! Vous êtes connecté.</p>
+          )}
+
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            {/* <Route path="/about" element={<AboutPage />} /> */}
+            <Route path="/create" element={<CreateListingForm />} />
+            <Route path="/checkout" element={<CheckoutForm />} />
+            {/* <Route path="*" element={<NotFoundPage />} /> */}
+          </Routes>
+        </div>
       </Elements>
     </BrowserRouter>
   );
