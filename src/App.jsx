@@ -11,6 +11,8 @@ import useAuth from "./hooks/useAuth";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import ListingPage from "./pages/ListingPage";
+import ListingDetail from "./pages/ListingDetail"; // Page de détail
+
 import "./App.css";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
@@ -32,6 +34,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/listing/:id" element={<ListingPage />} />
+            <Route path="/listing/:id" element={<ListingDetail />} />
             {/* <Route path="/about" element={<AboutPage />} /> */}
             <Route path="/create" element={<CreateListingForm />} />
             <Route path="/checkout" element={<CheckoutForm />} />

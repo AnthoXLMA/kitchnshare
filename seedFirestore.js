@@ -4,12 +4,12 @@ import { getFirestore, collection, addDoc } from "firebase/firestore";
 
 // 1. Configuration Firebase (copie la config de ton projet Firebase)
 const firebaseConfig = {
-  apiKey: "TON_API_KEY",
-  authDomain: "TON_DOMAINE.firebaseapp.com",
-  projectId: "TON_PROJECT_ID",
-  storageBucket: "TON_BUCKET.appspot.com",
-  messagingSenderId: "TON_SENDER_ID",
-  appId: "TON_APP_ID"
+  apiKey: "AIzaSyDqa9B1xZHCP3lXorgn5Kk_0ljt0aAcLC4",
+  authDomain: "kitchnshare.firebaseapp.com",
+  projectId: "kitchnshare",
+  storageBucket: "kitchnshare.appspot.com",  // <-- correction ici
+  messagingSenderId: "26857690872",
+  appId: "1:26857690872:web:1d3b227069eb596142cd0d"
 };
 
 // 2. Initialiser Firebase et Firestore
