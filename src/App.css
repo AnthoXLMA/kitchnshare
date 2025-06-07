@@ -1,23 +1,26 @@
+/* Root container */
 #root {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
+/* Logo styles */
 .logo {
-  height: 6em;
+  height: 80px;
   padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  transition: transform 300ms ease, filter 300ms ease;
+  will-change: transform, filter;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 1rem rgba(100, 108, 255, 0.7));
+  transform: scale(1.05);
 }
 
+/* Spin animation (optional) */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -26,17 +29,22 @@
     transform: rotate(360deg);
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo.spin {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* Card for displaying property info */
 .card {
-  padding: 2em;
+  background-color: #fff;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  transition: transform 200ms ease;
 }
-
-.read-the-docs {
-  color: #888;
+.card:hover {
+  transform: translateY(-5px);
 }
