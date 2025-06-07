@@ -6,6 +6,8 @@ import 'leaflet/dist/leaflet.css';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import BookingForm from "../components/ui/BookingForm";
+import { Link } from "react-router-dom";
+
 
 export default function HomePage() {
   // États pour les filtres de recherche
@@ -110,6 +112,11 @@ export default function HomePage() {
           filteredListings.map((listing) => (
             <Card key={listing.id}>
               <CardContent className="p-4">
+              <h2 className="text-xl font-semibold">
+                <Link to={`/listing/${listing.id}`} className="hover:underline text-blue-600">
+                  {listing.title}
+                </Link>
+              </h2>
                 <img
                   src={listing.imageUrl || "https://source.unsplash.com/400x300/?kitchen"}
                   alt={listing.title}
