@@ -122,7 +122,6 @@ export default function HomePage() {
                   alt={listing.title}
                   className="w-full h-40 object-cover rounded mb-2"
                 />
-                <h2 className="text-xl font-semibold">{listing.title}</h2>
                 <p className="text-sm text-gray-600">{listing.location}</p>
                 <p className="text-sm mt-1">{listing.description}</p>
                 <p className="text-lg font-bold mt-2">{listing.price} € / jour</p>

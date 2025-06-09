@@ -19,16 +19,20 @@ export default function ListingPage() {
     fetchListing();
   }, [id]);
 
-  return <div>Page Listing</div>;
-
-  if (!listing) return <p>Chargement...</p>;
+  if (!listing) return <p className="p-4">Chargement...</p>;
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">{listing.title}</h1>
       <p className="text-gray-700 mb-2">{listing.description}</p>
       <p className="text-lg font-semibold">{listing.price} € / jour</p>
-      <img src={listing.imageUrl} alt={listing.title} className="my-4 w-full max-w-md" />
+      <p className="text-sm text-gray-600">Capacité : {listing.capacity} personnes</p>
+      <p className="text-sm text-gray-600">Localisation : {listing.location}</p>
+      <img
+        src={listing.imageUrl || "https://source.unsplash.com/800x600/?kitchen,bathroom"}
+        alt={listing.title}
+        className="my-4 w-full max-w-md rounded"
+      />
       <BookingForm listing={listing} />
     </div>
   );
