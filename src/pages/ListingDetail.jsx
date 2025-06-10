@@ -31,7 +31,7 @@ export default function ListingDetail() {
     <div className="max-w-3xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">{listing.title}</h1>
       <img
-        src={listing.imageUrl || "https://source.unsplash.com/600x400/?kitchen,bathroom"}
+        src={listing.imageUrl || "https://unsplash.com/fr/photos/white-ceramic-bathtub-PibraWHb4h8"}
         alt={listing.title}
         className="w-full h-64 object-cover rounded mb-4"
       />
