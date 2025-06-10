@@ -29,10 +29,11 @@ export default function ListingPage() {
       <p className="text-sm text-gray-600">Capacité : {listing.capacity} personnes</p>
       <p className="text-sm text-gray-600">Localisation : {listing.location}</p>
       <img
-        src={listing.imageUrl || "https://source.unsplash.com/800x600/?kitchen,bathroom"}
+        src={listing.imageUrl || "https://unsplash.com/fr/photos/white-ceramic-bathtub-PibraWHb4h8"}
         alt={listing.title}
         className="my-4 w-full max-w-md rounded"
       />
+
       <BookingForm listing={listing} />
     </div>
   );
