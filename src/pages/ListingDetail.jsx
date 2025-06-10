@@ -40,6 +40,12 @@ export default function ListingDetail() {
       <p className="mb-2"><strong>Description :</strong> {listing.description}</p>
       <p className="mb-2"><strong>Prix :</strong> {listing.price} € / jour</p>
       {/* Tu peux ajouter d’autres infos ici : capacité, disponibilité, etc. */}
+      {listing.userId === currentUser?.uid && (
+        <Link to={`/edit/${listing.id}`} className="text-blue-600 hover:underline">
+          ✏️ Modifier cette annonce
+        </Link>
+    )}
     </div>
+
   );
 }
