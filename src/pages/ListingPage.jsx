@@ -33,7 +33,11 @@ export default function ListingPage() {
         alt={listing.title}
         className="my-4 w-full max-w-md rounded"
       />
-
+      {listing.userId === currentUser?.uid && (
+        <Link to={`/edit/${listing.id}`} className="text-blue-600 hover:underline">
+          ✏️ Modifier cette annonce
+        </Link>
+      )}
       <BookingForm listing={listing} />
     </div>
   );
