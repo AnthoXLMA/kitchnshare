@@ -118,9 +118,9 @@ export default function HomePage() {
                 </Link>
               </h2>
                 <img
-                  src={listing.imageUrl || "https://source.unsplash.com/400x300/?kitchen"}
+                  src={listing.imageUrl || "https://unsplash.com/fr/photos/white-ceramic-bathtub-PibraWHb4h8"}
                   alt={listing.title}
-                  className="w-full h-40 object-cover rounded mb-2"
+                    className="w-full max-h-48 object-cover rounded mb-2 sm:max-h-40"
                 />
                 <p className="text-sm text-gray-600">{listing.location}</p>
                 <p className="text-sm mt-1">{listing.description}</p>

@@ -1,40 +1,57 @@
+// functions/index.js
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const sgMail = require("@sendgrid/mail");
+
 
 admin.initializeApp();
-sgMail.setApiKey(functions.config().sendgrid.key);
 
-exports.sendBookingConfirmation = functions.firestore
-  .document("reservations/{reservationId}")
-  .onCreate(async (snap, context) => {
-    const reservation = snap.data();
+exports.createReservation = functions.https.onCall(async (data, context) => {
+  const { listingId, startDate, endDate } = data;
 
-    // Récupérer info utilisateur et listing si besoin
-    const userRef = admin.firestore().collection("users").doc(reservation.userId);
-    const userDoc = await userRef.get();
-    const userEmail = userDoc.exists ? userDoc.data().email : null;
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Non authentifié.");
+  }
 
-    if (!userEmail) {
-      console.log("Utilisateur sans email");
-      return null;
-    }
+  const userId = context.auth.uid; // ✅ ne PAS le passer depuis le client
 
-    // Préparer l'email
-    const msg = {
-      to: userEmail,
-      from: "no-reply@kitchnshare.com", // ton email validé SendGrid
-      subject: `Confirmation de réservation ${reservation.listingId}`,
-      text: `Votre réservation du ${reservation.startDate.toDate()} au ${reservation.endDate.toDate()} a bien été prise en compte.`,
-      html: `<p>Votre réservation du <strong>${reservation.startDate.toDate().toLocaleDateString()}</strong> au <strong>${reservation.endDate.toDate().toLocaleDateString()}</strong> a bien été prise en compte.</p>`,
-    };
+  if (!listingId || !startDate || !endDate) {
+    throw new functions.https.HttpsError("invalid-argument", "Données incomplètes.");
+  }
 
-    try {
-      await sgMail.send(msg);
-      console.log("Email de confirmation envoyé à", userEmail);
-    } catch (error) {
-      console.error("Erreur envoi email", error);
-    }
+  const start = new Date(startDate);
+  const end = new Date(endDate);
 
-    return null;
+  if (start >= end) {
+    throw new functions.https.HttpsError("invalid-argument", "Dates invalides.");
+  }
+
+  // Vérification des chevauchements
+  const snapshot = await admin.firestore()
+    .collection("reservations")
+    .where("listingId", "==", listingId)
+    .where("status", "==", "confirmed")
+    .get();
+
+  const overlap = snapshot.docs.some((doc) => {
+    const res = doc.data();
+    const resStart = res.startDate.toDate();
+    const resEnd = res.endDate.toDate();
+    return start <= resEnd && end >= resStart;
   });
+
+  if (overlap) {
+    throw new functions.https.HttpsError("already-exists", "Chevauchement de réservation.");
+  }
+
+  // Création de la réservation
+  await admin.firestore().collection("reservations").add({
+    listingId,
+    userId,
+    startDate: admin.firestore.Timestamp.fromDate(start),
+    endDate: admin.firestore.Timestamp.fromDate(end),
+    status: "confirmed",
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  return { success: true };
+});
