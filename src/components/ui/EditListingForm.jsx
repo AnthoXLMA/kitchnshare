@@ -1,34 +1,43 @@
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useParams, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
-// import { useAuth } from "../../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+
 
 export default function EditListingForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const currentUser = useAuth(); // ✅ correct : currentUser est bien défini
   const [form, setForm] = useState(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const fetchListing = async () => {
-      const docRef = doc(db, "listings", id);
-      const docSnap = await getDoc(docRef);
+  const fetchListing = async () => {
+    if (!currentUser) return; // attendre que l'utilisateur soit défini
+    const docRef = doc(db, "listings", id);
+    const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.userId !== currentUser.uid) {
-          setMessage("⛔ Accès refusé");
-          return;
-        }
-        setForm({ ...data });
-      } else {
-        setMessage("❌ Annonce introuvable.");
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data.userId !== currentUser.uid) {
+        setMessage("⛔ Accès refusé");
+        return;
       }
-    };
-    fetchListing();
-  }, [id, currentUser]);
+      setForm({
+        ...data,
+        imageUrls: Array.isArray(data.imageUrls) && data.imageUrls[0]
+          ? data.imageUrls
+          : data.imageUrl
+            ? [data.imageUrl]
+            : [""],
+      });
+    } else {
+      setMessage("❌ Annonce introuvable.");
+    }
+  };
+  fetchListing();
+}, [id, currentUser]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -51,7 +60,7 @@ export default function EditListingForm() {
       await updateDoc(docRef, {
         ...form,
         price: Number(form.price),
-        updatedAt: new Date(),
+        updatedAt: serverTimestamp(),
       });
       setMessage("✅ Annonce mise à jour !");
       navigate(`/listing/${id}`);
@@ -81,6 +90,25 @@ export default function EditListingForm() {
           {form.imageUrls.map((url, index) => (
             <input key={index} value={url} onChange={(e) => handleImageChange(index, e.target.value)} placeholder={`Image ${index + 1}`} className="w-full border p-2 rounded mt-2" />
           ))}
+          <div className="mt-4">
+            <p className="font-semibold mb-2">Aperçu des images :</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {form.imageUrls.map((url, index) => (
+                url ? (
+                  <div
+                    key={index}
+                    className="w-full h-32 overflow-hidden rounded-lg border shadow-sm"
+                  >
+                    <img
+                      src={url}
+                      alt={`Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : null
+              ))}
+            </div>
+          </div>
           <button type="button" onClick={addImageField} className="mt-2 text-blue-600 hover:underline">
             ➕ Ajouter une image
           </button>
