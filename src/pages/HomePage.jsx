@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { Link } from "react-router-dom";
+import { geocodeAdresse } from "../utils/geocode";
 
 export default function HomePage() {
   // États pour les filtres de recherche
@@ -19,22 +20,42 @@ export default function HomePage() {
   const [listings, setListings] = useState([]);
 
   useEffect(() => {
-    const fetchListings = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, "listings"));
-        const data = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        console.log("📦 Listings reçus :", data);
-        setListings(data);
-      } catch (error) {
-        console.error("🔥 Erreur Firestore :", error);
-      }
-    };
+  const fetchListings = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, "listings"));
 
-    fetchListings();
-  }, []);
+      const data = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const listing = {
+            id: doc.id,
+            ...doc.data(),
+          };
+
+          if (!listing.latitude || !listing.longitude) {
+            try {
+              const coords = await geocodeAdresse(listing.location);
+              listing.latitude = coords.latitude;
+              listing.longitude = coords.longitude;
+            } catch (err) {
+              console.warn(`Géocodage échoué pour : ${listing.title}`, err);
+            }
+          }
+
+          return listing;
+        })
+      );
+
+      console.log("📦 Listings géocodés :", data);
+      setListings(data);
+    } catch (error) {
+      console.error("🔥 Erreur Firestore :", error);
+    }
+  };
+
+  fetchListings();
+}, []);
+
+
 
   // Vérifie si une date est dans la plage de disponibilité d'un listing
   function isAvailable(listing, start, end) {
@@ -48,26 +69,37 @@ export default function HomePage() {
 
   // Au clic sur Réserver
   function handleReserve(listing) {
-    alert(`Tu veux réserver : ${listing.title} (ID: ${listing.id})`);
+
+  const confirmReservation = window.confirm(`Veux-tu vraiment réserver : ${listing.title} ?`);
+  if (confirmReservation) {
+    alert(`Réservation confirmée pour : ${listing.title} (ID: ${listing.id})`);
+    // Ici tu peux ajouter ta logique réelle de réservation
+  } else {
+    alert("Réservation annulée");
+
   }
+}
 
-  // Filtrer les annonces selon les critères
-  const filteredListings = listings.filter(listing => {
-    const matchesLocation = listing.location?.toLowerCase().includes(location.toLowerCase());
-    const matchesPeople = listing.capacity ? listing.capacity >= people : true;
-    const matchesDate = startDate && endDate ? isAvailable(listing, startDate, endDate) : true;
-    const matchesCategory = category ? listing.category === category : true; // filtre catégorie
 
-    return matchesLocation && matchesPeople && matchesDate && matchesCategory;
-  });
+// Filtrer les annonces selon les critères
+const filteredListings = listings.filter(listing => {
+  const matchesLocation = listing.location?.toLowerCase().includes(location.toLowerCase());
+  const matchesPeople = listing.capacity ? listing.capacity >= people : true;
+  const matchesDate = startDate && endDate ? isAvailable(listing, startDate, endDate) : true;
+  const matchesCategory = category ? listing.type === category : true;
+
+  return matchesLocation && matchesPeople && matchesDate && matchesCategory;
+});
 
   return (
     <>
       {/* Container principal centré avec padding */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="max-w-7xl mx-auto px-4">
 
         {/* Formulaire dans un bloc blanc arrondi avec marge en bas */}
-        <form className="flex flex-wrap gap-4" onSubmit={e => e.preventDefault()}>
+        <form className="relative z-10 flex flex-wrap gap-4 mb-8 p-4 bg-white rounded-xl shadow-lg"
+  onSubmit={e => e.preventDefault()}>
+
           <input
             type="text"
             placeholder="Ville, quartier..."
@@ -112,42 +144,49 @@ export default function HomePage() {
             className="h-10 rounded-3xl px-4 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition text-gray-900 font-semibold text-base"
           >
             <option value="">Toutes catégories</option>
-            <option value="bathroom">Salles de bains</option>
-            <option value="cuisine">Cuisines</option>
-            <option value="love_room">Love room</option>
+
+            <option value="Cuisine">Cuisines</option>
+            <option value="Salle de bain">Salles de bain</option>
+            <option value="Love Room">Love Rooms</option>
           </select>
         </form>
 
+        {/* Map */}
+        <div className="mt-8 max-w-5xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-4">Trouvez ce que vous cherchez</h2>
+          <Map listings={filteredListings} />
+        </div>
+        <div className="mt-8 max-w-5xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-4">Liste des annonces</h2>
+        </div>
         {/* Liste des annonces */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mt-8">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredListings.length > 0 ? (
             filteredListings.map(listing => (
               <Card key={listing.id} className="p-0">
-                <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-                  <img
-                    loading="lazy"
-                    src={listing.imageUrls?.[0] || ""}
-                    alt={listing.title}
-                    className="w-full sm:w-40 h-32 object-cover rounded-lg flex-shrink-0"
-                  />
-                  <div className="flex flex-col justify-between">
-                    <h2 className="text-xl font-semibold mb-1">
-                      <Link
-                        to={`/listing/${listing.id}`}
-                        className="hover:underline text-blue-600"
-                      >
-                        {listing.title}
-                      </Link>
-                    </h2>
-                    <p className="text-sm text-gray-600">{listing.location}</p>
-                    <p className="text-sm mt-1">{listing.description}</p>
-                    <p className="text-lg font-bold mt-2">{listing.price} € / jour</p>
-                    <Button className="mt-2 self-start" onClick={() => handleReserve(listing)}>
-                      Réserver
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+  <CardContent className="p-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+    <img
+      loading="lazy"
+      src={listing.imageUrls?.[0] || ""}
+      alt={listing.title}
+      className="w-full h-48 sm:w-40 sm:h-40 object-cover rounded-lg"
+    />
+    <div className="flex flex-col justify-between">
+      <h2 className="text-lg sm:text-xl font-semibold mb-1 truncate">
+        <Link to={`/listing/${listing.id}`} className="hover:underline text-blue-600">
+          {listing.title}
+        </Link>
+      </h2>
+      <p className="text-sm text-gray-600 truncate">{listing.location}</p>
+      <p className="text-sm mt-1 line-clamp-2">{listing.description}</p>
+      <p className="text-lg font-bold mt-2">{listing.price} € / jour</p>
+      <Link to={`/listing/${listing.id}`}>
+        <Button className="mt-2 sm:w-auto">Voir détails</Button>
+      </Link>
+    </div>
+  </CardContent>
+</Card>
+
             ))
           ) : (
             <p className="max-w-5xl mx-auto text-center">
@@ -156,11 +195,6 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* Map */}
-        <div className="mt-8 max-w-5xl mx-auto">
-          <h2 className="text-2xl font-semibold mb-4">Nos emplacements</h2>
-          <Map listings={filteredListings} />
-        </div>
       </div>
     </>
   );

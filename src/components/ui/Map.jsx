@@ -1,5 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import { geocodeAdresse } from "../../utils/geocode";
+
 
 // Exemple d’icônes différentes
 const kitchenIcon = new L.Icon({
@@ -49,3 +51,4 @@ export default function Map({ listings }) {
     </MapContainer>
   );
 }
+

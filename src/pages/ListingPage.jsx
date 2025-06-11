@@ -6,10 +6,16 @@ import BookingForm from "../components/ui/BookingForm";
 import EditListingForm from "../components/ui/EditListingForm";
 import useAuth from "../hooks/useAuth"; // adapte le chemin si nécessaire
 
+import { useNavigate } from "react-router-dom";
+
+
 export default function ListingPage() {
   const { id } = useParams(); // récupère l'id de l'URL
   const [listing, setListing] = useState(null);
   const currentUser = useAuth();
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     async function fetchListing() {
@@ -22,6 +28,34 @@ export default function ListingPage() {
     fetchListing();
   }, [id]);
 
+
+  function handleReserve(startDate, endDate) {
+  if (!startDate || !endDate) {
+    alert("Merci de choisir une période.");
+    return;
+  }
+
+  const totalPrice = calculateTotalPrice(listing.price, startDate, endDate);
+
+  const reservationData = {
+    listingId: listing.id,
+    title: listing.title,
+    price: listing.price,
+    startDate,
+    endDate,
+    totalPrice,
+  };
+
+  navigate("/payment", { state: reservationData });
+}
+
+
+  function calculateTotalPrice(pricePerDay, start, end) {
+    const startD = new Date(start);
+    const endD = new Date(end);
+    const diffDays = Math.ceil((endD - startD) / (1000 * 60 * 60 * 24));
+    return diffDays * pricePerDay;
+  }
   if (!listing) return <p className="p-4">Chargement...</p>;
 
   return (
@@ -42,7 +76,9 @@ export default function ListingPage() {
           ✏️ Modifier cette annonce
         </Link>
       ) : null}
-      <BookingForm listing={listing} />
+
+<BookingForm listing={listing} onReserve={handleReserve} />
     </div>
   );
 }
+
