@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import BookingForm from "../components/ui/BookingForm";
+import useAuth from "../hooks/useAuth"; // adapte le chemin si nécessaire
 
 export default function ListingPage() {
   const { id } = useParams(); // récupère l'id de l'URL
   const [listing, setListing] = useState(null);
+  const currentUser = useAuth();
 
   useEffect(() => {
     async function fetchListing() {
