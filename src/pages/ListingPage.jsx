@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import BookingForm from "../components/ui/BookingForm";
+import EditListingForm from "../components/ui/EditListingForm";
 import useAuth from "../hooks/useAuth"; // adapte le chemin si nécessaire
 
 export default function ListingPage() {
@@ -35,11 +36,12 @@ export default function ListingPage() {
         alt={listing.title}
         className="my-4 w-full max-w-md rounded"
       />
-      {listing.userId === currentUser?.uid && (
+      <EditListingForm listing={listing} />
+      {currentUser?.uid === listing.userId ? (
         <Link to={`/edit/${listing.id}`} className="text-blue-600 hover:underline">
           ✏️ Modifier cette annonce
         </Link>
-      )}
+      ) : null}
       <BookingForm listing={listing} />
     </div>
   );
