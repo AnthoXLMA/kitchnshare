@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase";
-// import { useAuth } from "../../hooks/useAuth"; // selon ton setup
+import useAuth from "../../hooks/useAuth"; // ou le chemin adapté
 
 export default function CreateListingForm() {
+  const currentUser = useAuth();
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -21,7 +22,12 @@ export default function CreateListingForm() {
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+    if (!currentUser) {
+    setMessage("❌ Vous devez être connecté pour créer une annonce.");
+    return;
+  }
     try {
       await addDoc(collection(db, "listings"), {
         ...form,
@@ -103,12 +109,13 @@ export default function CreateListingForm() {
         />
         <select
           name="type"
-          value={form.type}
+          value={form.category}
           onChange={handleChange}
           className="w-full border p-2 rounded"
         >
           <option value="Cuisine">Cuisine</option>
           <option value="Salle de bain">Salle de bain</option>
+          <option value="Salle de bain">Love Room</option>
         </select>
 
         {/* Champs dynamiques pour plusieurs images */}
