@@ -41,9 +41,12 @@ export default function HomePage() {
   function isAvailable(listing, start, end) {
     if (!listing.availability) return true; // Pas de données dispo = disponible
     return listing.availability.some(slot => {
-      return !(new Date(end) < new Date(slot.startDate) || new Date(start) > new Date(slot.endDate));
+      const startOk = new Date(start) >= new Date(slot.startDate);
+      const endOk = new Date(end) <= new Date(slot.endDate);
+      return startOk && endOk;
     });
   }
+
 
   // Fonction appelée au clic sur Réserver
   function handleReserve(listing) {
@@ -118,6 +121,7 @@ export default function HomePage() {
                 </Link>
               </h2>
                 <img
+                  loading="lazy"
                   src={listing.imageUrl || "https://unsplash.com/fr/photos/white-ceramic-bathtub-PibraWHb4h8"}
                   alt={listing.title}
                     className="w-full max-h-48 object-cover rounded mb-2 sm:max-h-40"
