@@ -5,13 +5,17 @@ import { db } from "../firebase";
 import BookingForm from "../components/ui/BookingForm";
 import EditListingForm from "../components/ui/EditListingForm";
 import useAuth from "../hooks/useAuth"; // adapte le chemin si nécessaire
+
 import { useNavigate } from "react-router-dom";
+
 
 export default function ListingPage() {
   const { id } = useParams(); // récupère l'id de l'URL
   const [listing, setListing] = useState(null);
   const currentUser = useAuth();
+
   const navigate = useNavigate();
+
 
   useEffect(() => {
     async function fetchListing() {
@@ -23,6 +27,7 @@ export default function ListingPage() {
     }
     fetchListing();
   }, [id]);
+
 
   function handleReserve(startDate, endDate) {
   if (!startDate || !endDate) {
@@ -52,6 +57,7 @@ export default function ListingPage() {
     return diffDays * pricePerDay;
   }
   if (!listing) return <p className="p-4">Chargement...</p>;
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">{listing.title}</h1>
@@ -70,6 +76,7 @@ export default function ListingPage() {
           ✏️ Modifier cette annonce
         </Link>
       ) : null}
+
 <BookingForm listing={listing} onReserve={handleReserve} />
     </div>
   );

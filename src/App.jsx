@@ -13,7 +13,6 @@ import EditListingForm from "./components/ui/EditListingForm";
 import MyListings from "./pages/MyListings";
 import PaymentPage from "./pages/PaymentPage"; // adapte le chemin
 
-
 import "./App.css";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);

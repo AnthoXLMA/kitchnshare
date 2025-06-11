@@ -8,7 +8,6 @@ import { db } from "../firebase";
 import { Link } from "react-router-dom";
 import { geocodeAdresse } from "../utils/geocode";
 
-
 export default function HomePage() {
   // États pour les filtres de recherche
   const [location, setLocation] = useState("");
@@ -57,6 +56,7 @@ export default function HomePage() {
 }, []);
 
 
+
   // Vérifie si une date est dans la plage de disponibilité d'un listing
   function isAvailable(listing, start, end) {
     if (!listing.availability) return true; // Pas de données dispo = disponible
@@ -69,14 +69,17 @@ export default function HomePage() {
 
   // Au clic sur Réserver
   function handleReserve(listing) {
+
   const confirmReservation = window.confirm(`Veux-tu vraiment réserver : ${listing.title} ?`);
   if (confirmReservation) {
     alert(`Réservation confirmée pour : ${listing.title} (ID: ${listing.id})`);
     // Ici tu peux ajouter ta logique réelle de réservation
   } else {
     alert("Réservation annulée");
+
   }
 }
+
 
 // Filtrer les annonces selon les critères
 const filteredListings = listings.filter(listing => {
@@ -96,6 +99,7 @@ const filteredListings = listings.filter(listing => {
         {/* Formulaire dans un bloc blanc arrondi avec marge en bas */}
         <form className="relative z-10 flex flex-wrap gap-4 mb-8 p-4 bg-white rounded-xl shadow-lg"
   onSubmit={e => e.preventDefault()}>
+
           <input
             type="text"
             placeholder="Ville, quartier..."
@@ -140,6 +144,7 @@ const filteredListings = listings.filter(listing => {
             className="h-10 rounded-3xl px-4 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition text-gray-900 font-semibold text-base"
           >
             <option value="">Toutes catégories</option>
+
             <option value="Cuisine">Cuisines</option>
             <option value="Salle de bain">Salles de bain</option>
             <option value="Love Room">Love Rooms</option>
@@ -189,6 +194,7 @@ const filteredListings = listings.filter(listing => {
             </p>
           )}
         </div>
+
       </div>
     </>
   );

@@ -20,6 +20,7 @@ import { getApp } from "firebase/app";
 const functions = getFunctions(getApp());
 
 export default function BookingForm({ listing, onReserve }) {
+
   const [selectionRange, setSelectionRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -57,6 +58,7 @@ export default function BookingForm({ listing, onReserve }) {
     setSelectionRange(ranges.selection);
   };
 
+
   const getDisabledDates = () => {
     const dateSet = new Set();
     reservedRanges.forEach(({ start, end }) => {
@@ -70,6 +72,7 @@ export default function BookingForm({ listing, onReserve }) {
       }
     });
     return Array.from(dateSet).map(dateStr => new Date(dateStr));
+
   };
 
   const renderDayContent = (day) => {
@@ -78,14 +81,16 @@ export default function BookingForm({ listing, onReserve }) {
 
     return (
       <div
-        className="w-full h-full flex items-center justify-center rounded-full"
-        style={
-          isDisabled
-            ? { backgroundColor: "#FF00AA", color: "white", fontWeight: "bold" }
-            : {}
-        }
-      >
-        {day.getDate()}
+
+      className="w-full h-full flex items-center justify-center rounded-full"
+      style={
+        isDisabled
+          ? { backgroundColor: "#FF00AA", color: "white", fontWeight: "bold" } // rose fluo vif
+          : {}
+      }
+    >
+       {day.getDate()}
+
       </div>
     );
   };
@@ -99,9 +104,11 @@ export default function BookingForm({ listing, onReserve }) {
         minDate={new Date()}
         disabledDates={getDisabledDates()}
         dayContentRenderer={renderDayContent}
+
       />
       <button
         onClick={() => onReserve(selectionRange.startDate, selectionRange.endDate)}
+
         className="mt-4 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
       >
         Réserver

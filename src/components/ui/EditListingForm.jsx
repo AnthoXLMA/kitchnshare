@@ -85,6 +85,7 @@ export default function EditListingForm() {
           <option value="Cuisine">Cuisine</option>
             <option value="Salle de bain">Salles de bain</option>
             <option value="Love Room">Love Rooms</option>
+
         </select>
         <div>
           <p className="font-semibold">Photos (URLs)</p>
