@@ -114,8 +114,8 @@ export default function CreateListingForm() {
           className="w-full border p-2 rounded"
         >
           <option value="Cuisine">Cuisine</option>
-          <option value="Salle de bain">Salle de bain</option>
-          <option value="Salle de bain">Love Room</option>
+            <option value="Salle de bain">Salles de bain</option>
+            <option value="Love Room">Love Rooms</option>
         </select>
 
         {/* Champs dynamiques pour plusieurs images */}

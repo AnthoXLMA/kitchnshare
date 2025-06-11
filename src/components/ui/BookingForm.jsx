@@ -19,7 +19,7 @@ import { getApp } from "firebase/app";
 
 const functions = getFunctions(getApp());
 
-export default function BookingForm({ listing }) {
+export default function BookingForm({ listing, onReserve }) {
   const [selectionRange, setSelectionRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -53,97 +53,23 @@ export default function BookingForm({ listing }) {
     fetchReservations();
   }, [listing?.id]);
 
-  // Générer la liste des dates désactivées
-  // const getDisabledDates = () => {
-  //   const dates = [];
-  //   reservedRanges.forEach(({ start, end }) => {
-  //     let current = new Date(start);
-  //     // On met l'heure à 0 pour éviter les problèmes de comparaison
-  //     current.setHours(0, 0, 0, 0);
-  //     const last = new Date(end);
-  //     last.setHours(0, 0, 0, 0);
-  //     while (current <= last) {
-  //       dates.push(new Date(current));
-  //       current.setDate(current.getDate() + 1);
-  //     }
-  //   });
-  //   return dates;
-  // };
-
-  const getDisabledDates = () => {
-  const dateSet = new Set();
-  reservedRanges.forEach(({ start, end }) => {
-    let current = new Date(start);
-    current.setHours(0, 0, 0, 0);
-    const last = new Date(end);
-    last.setHours(0, 0, 0, 0);
-    while (current <= last) {
-      dateSet.add(current.toISOString().split("T")[0]); // clé ISO jour
-      current.setDate(current.getDate() + 1);
-    }
-  });
-  return Array.from(dateSet).map(dateStr => new Date(dateStr));
-};
-
   const handleSelect = (ranges) => {
     setSelectionRange(ranges.selection);
   };
 
-  const handleBooking = async () => {
-    if (!user) {
-      setMessage("❌ Vous devez être connecté pour réserver.");
-      return;
-    }
-
-    // Vérification de chevauchement côté client
-    const overlap = reservedRanges.some(({ start, end }) => {
-      return (
-        selectionRange.startDate <= end &&
-        selectionRange.endDate >= start
-      );
+  const getDisabledDates = () => {
+    const dateSet = new Set();
+    reservedRanges.forEach(({ start, end }) => {
+      let current = new Date(start);
+      current.setHours(0, 0, 0, 0);
+      const last = new Date(end);
+      last.setHours(0, 0, 0, 0);
+      while (current <= last) {
+        dateSet.add(current.toISOString().split("T")[0]);
+        current.setDate(current.getDate() + 1);
+      }
     });
-
-    if (overlap) {
-      setMessage("❌ Ces dates sont déjà réservées. Veuillez en choisir d'autres.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "reservations"), {
-        listingId: listing.id,
-        userId: user.uid,
-        startDate: Timestamp.fromDate(selectionRange.startDate),
-        endDate: Timestamp.fromDate(selectionRange.endDate),
-        createdAt: serverTimestamp(),
-        status: "confirmed",
-      });
-
-      await emailjs.send(
-        "service_o8hrryp",     // <-- Remplace par ton service ID
-        "template_7u1g3t8",    // <-- Remplace par ton template ID
-        {
-          to_name: user.displayName || "Utilisateur",
-          to_email: user.email,
-          listing_title: listing.title,
-          start_date: selectionRange.startDate.toLocaleDateString(),
-          end_date: selectionRange.endDate.toLocaleDateString(),
-        },
-        "oXEaqZ2fuolWa_SnH"         // <-- Remplace par ta clé publique EmailJS
-      );
-
-      setReservedRanges((prev) => [
-        ...prev,
-        {
-          start: new Date(selectionRange.startDate),
-          end: new Date(selectionRange.endDate),
-        },
-      ]);
-
-      setMessage("✅ Réservation enregistrée ! Un e‑mail de confirmation vous a été envoyé.");
-    } catch (error) {
-      console.error("Erreur réservation ou e‑mail :", error);
-      setMessage("❌ Erreur lors de la réservation ou de l’envoi de l’e‑mail.");
-    }
+    return Array.from(dateSet).map(dateStr => new Date(dateStr));
   };
 
   const renderDayContent = (day) => {
@@ -152,14 +78,14 @@ export default function BookingForm({ listing }) {
 
     return (
       <div
-      className="w-full h-full flex items-center justify-center rounded-full"
-      style={
-        isDisabled
-          ? { backgroundColor: "#FF00AA", color: "white", fontWeight: "bold" } // rose fluo vif
-          : {}
-      }
-    >
-       {day.getDate()}
+        className="w-full h-full flex items-center justify-center rounded-full"
+        style={
+          isDisabled
+            ? { backgroundColor: "#FF00AA", color: "white", fontWeight: "bold" }
+            : {}
+        }
+      >
+        {day.getDate()}
       </div>
     );
   };
@@ -173,9 +99,9 @@ export default function BookingForm({ listing }) {
         minDate={new Date()}
         disabledDates={getDisabledDates()}
         dayContentRenderer={renderDayContent}
-        />
+      />
       <button
-        onClick={handleBooking}
+        onClick={() => onReserve(selectionRange.startDate, selectionRange.endDate)}
         className="mt-4 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
       >
         Réserver

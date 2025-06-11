@@ -83,7 +83,8 @@ export default function EditListingForm() {
         <input name="capacity" type="number" value={form.capacity} onChange={handleChange} className="w-full border p-2 rounded" required />
         <select name="type" value={form.type} onChange={handleChange} className="w-full border p-2 rounded">
           <option value="Cuisine">Cuisine</option>
-          <option value="Salle de bain">Salle de bain</option>
+            <option value="Salle de bain">Salles de bain</option>
+            <option value="Love Room">Love Rooms</option>
         </select>
         <div>
           <p className="font-semibold">Photos (URLs)</p>

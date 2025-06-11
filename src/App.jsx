@@ -11,6 +11,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import ListingPage from "./pages/ListingPage";
 import EditListingForm from "./components/ui/EditListingForm";
 import MyListings from "./pages/MyListings";
+import PaymentPage from "./pages/PaymentPage"; // adapte le chemin
+
 
 import "./App.css";
 
@@ -37,6 +39,7 @@ export default function App() {
             <Route path="/checkout" element={<CheckoutForm />} />
             <Route path="/edit/:id" element={<EditListingForm />} />
             <Route path="/my-listings" element={<MyListings />} />
+            <Route path="/payment" element={<PaymentPage />} />
 
             {/* <Route path="*" element={<NotFoundPage />} /> */}
           </Routes>
